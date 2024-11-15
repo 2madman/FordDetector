@@ -1,64 +1,70 @@
-from PIL import Image, ImageFilter
+import os
+from PIL import Image
 import numpy as np
-import matplotlib.pyplot as plt
+import canny
 
-# Define the target size for resizing (width, height)
-target_size = (400, 400)
-
-# Define paths to the images of the 10 Ford models
-model_image_paths = [
-    'Cars/focus2016.jpg',  # Replace with your image paths
-    'Cars/focus2017.png',
-]
-
-# Function to preprocess the image and mask the background
-def preprocess_image(image_path):
-    # Load, resize, and convert to grayscale
-    image = Image.open(image_path).resize(target_size).convert('L')
+def calculate_mse(image1, image2):
+    # Ensure both images are numpy arrays
+    img1_array = np.asarray(image1, dtype=np.float64)
+    img2_array = np.asarray(image2, dtype=np.float64)
     
-    # Apply edge detection
-    edges = image.filter(ImageFilter.FIND_EDGES)
+    # Ensure the images have the same shape
+    if img1_array.shape != img2_array.shape:
+        raise ValueError("Images must have the same dimensions for comparison.")
     
-    # Apply a threshold to create a binary mask for the car
-    threshold_value = 100  # Adjust this value to separate the car from the background
-    mask = np.array(edges) > threshold_value  # Binary mask of the car
+    # Calculate MSE
+    mse = np.mean((img1_array - img2_array) ** 2)
+    return mse
+
+
+def compare_with_edge_detected_folder(image_path, edge_detected_folder="EdgeDetected"):
+    # Open the image to compare
+    with Image.open(image_path) as img:
+        base_image = img.convert("L")  # Convert to grayscale for comparison
+
+    results = {}
     
-    # Apply the mask to the edge-detected image
-    edges_array = np.array(edges)
-    masked_edges = np.where(mask, edges_array, 0)  # Zero out background edges
+    base_image = Image.open(image_path)
+    base_image = np.array(base_image)
+
+    if len(base_image.shape) == 3:
+        print("Converting to grayscale...")
+        base_image = canny.rgb_to_gray(base_image)
+
+    canny.save_image(base_image, "Temp/1-grayscale.jpg")
+
+    low_threshold = 100
+    high_threshold = 220
+    gaussian_kernel_size = 5
+    sobel_kernel_size = 3
+    base_image = canny.canny_edge_detection(base_image, low_threshold, high_threshold, gaussian_kernel_size, sobel_kernel_size)
+
+    # Ensure the 'EdgeDetected' folder exists
+    if not os.path.isdir(edge_detected_folder):
+        raise FileNotFoundError(f"Folder '{edge_detected_folder}' not found.")
     
-    return masked_edges
+    # Iterate over all files in the 'EdgeDetected' folder
+    for file_name in os.listdir(edge_detected_folder):
+        file_path = os.path.join(edge_detected_folder, file_name)
+        if os.path.isfile(file_path):
+            try:
+                with Image.open(file_path) as edge_img:
+                    edge_image = edge_img.convert("L")  # Convert to grayscale
+                    mse = calculate_mse(base_image, edge_image)
+                    results[file_path] = mse
+            except Exception as e:
+                print(f"Error processing image {file_path}: {e}")
+    
+    sorted_results = dict(sorted(results.items(), key=lambda item: item[1]))
+    return sorted_results
 
-# Store edge-detected images with background removed for each model
-model_edges = [(preprocess_image(path), path) for path in model_image_paths]
 
-# Function to find the best match with the lowest MSE
-def find_best_match(test_edges, model_edges):
-    best_score = float('inf')
-    best_match_path = ""
-    for model_edge, path in model_edges:
-        mse = np.mean((test_edges - model_edge) ** 2)
-        if mse < best_score:
-            best_score = mse
-            best_match_path = path
-    return best_score, best_match_path
-
-# Load a test image and preprocess it to remove background edges
-test_image_path = 'Cars/focus2016.jpg'  # Replace with the path of your test image
-test_edges = preprocess_image(test_image_path)
-
-# Find the best match
-best_score, best_match_path = find_best_match(test_edges, model_edges)
-
-# Display the test image and the best match model
-plt.figure(figsize=(10, 5))
-plt.subplot(1, 2, 1)
-plt.imshow(test_edges, cmap='gray')
-plt.title("Test Image Edges")
-
-plt.subplot(1, 2, 2)
-best_match_image = Image.open(best_match_path).resize(target_size)
-plt.imshow(best_match_image, cmap='gray')
-plt.title(f"Best Match: {best_match_path} (MSE: {best_score:.2f})")
-
-plt.show()
+# Example Usage
+if __name__ == "__main__":
+    input_image_path = "Cars/test.png"  # Replace with your image path
+    edge_detected_folder = "EdgeDetected"
+    
+    edge_detected_results = compare_with_edge_detected_folder(input_image_path, edge_detected_folder)
+    
+    for image_path, mse in edge_detected_results.items():
+        print(f"{image_path}: MSE={mse}")
