@@ -2,6 +2,14 @@ import os
 from PIL import Image
 import numpy as np
 import canny
+import re
+
+def extract_until_number(input_string):
+    # Get the portion after the last '/'
+    last_section = input_string.split("/")[-1]
+    # Extract characters until the first number
+    match = re.match(r"^[^\d]*", last_section)
+    return match.group(0) if match else ""
 
 def calculate_mse(image1, image2):
     # Ensure both images are numpy arrays
@@ -59,12 +67,28 @@ def compare_with_edge_detected_folder(image_path, edge_detected_folder="EdgeDete
     return sorted_results
 
 
-# Example Usage
+def extract_until_number(input_string):
+    result = ""
+    for char in input_string:
+        if char.isdigit():  # Check if the character is a digit
+            break          # Stop if a digit is found
+        result += char     # Append non-digit characters to the result
+    return result
+
+
 if __name__ == "__main__":
     input_image_path = "Cars/test.png"  # Replace with your image path
     edge_detected_folder = "EdgeDetected"
     
     edge_detected_results = compare_with_edge_detected_folder(input_image_path, edge_detected_folder)
     
+    lowestMse = 100000
+    car = ""
     for image_path, mse in edge_detected_results.items():
-        print(f"{image_path}: MSE={mse}")
+        if mse< lowestMse:
+            lowestMse = mse
+            car = image_path
+        #print(f"{image_path}: MSE={mse}")
+
+    car = extract_until_number(car)
+    print(car)
