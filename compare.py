@@ -75,12 +75,49 @@ def extract_until_number(input_string):
         result += char     # Append non-digit characters to the result
     return result
 
+def resize_image(image_array, size):
+    """
+    Resizes a single image represented as a numpy array to the given size.
+
+    Parameters:
+        image_array (numpy.ndarray): The input image as a numpy array.
+        size (tuple): The desired output size (width, height).
+    
+    Returns:
+        numpy.ndarray: The resized image as a numpy array.
+    """
+    height, width, _ = image_array.shape
+    new_height, new_width = size
+    
+    # Create a new array for the resized image
+    resized_array = np.zeros((new_height, new_width, 3), dtype=np.uint8)
+    
+    # Resize logic: mapping original image pixels to the new size
+    for i in range(new_height):
+        for j in range(new_width):
+            # Mapping the coordinates
+            orig_i = int(i * height / new_height)
+            orig_j = int(j * width / new_width)
+            resized_array[i, j] = image_array[orig_i, orig_j]
+    
+    return resized_array
+
+
+
 
 if __name__ == "__main__":
-    input_image_path = "Cars/test.png"  # Replace with your image path
-    edge_detected_folder = "EdgeDetected"
-    
-    edge_detected_results = compare_with_edge_detected_folder(input_image_path, edge_detected_folder)
+    input_image_path = "Cars/kuga6.png"  # Replace with your image path
+    edge_detected_folder = "EdgeDetectedFolder"
+
+    img = Image.open(input_image_path)
+    img_array = np.array(img)
+    resized_image_array = resize_image(img_array, [376,668])
+    resized_image = Image.fromarray(resized_image_array)
+    input_path = 'Temp/resized.png'
+    resized_image.save(input_path)
+
+
+    edge_detected_results = compare_with_edge_detected_folder(input_path, edge_detected_folder)
     
     lowestMse = 100000
     car = ""
