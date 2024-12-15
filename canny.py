@@ -2,8 +2,8 @@ from PIL import Image
 import numpy as np
 import sys
 
-carname = "transitcourier"
-path_to_image = f"Cars/{carname}.png"
+carname = "ranger"
+path_to_image = f"CompareCars/{carname}.png"
 
 def save_image(image, file_path):
     # Convert numpy array to PIL Image and save it
@@ -150,4 +150,4 @@ result = f"{carname}{low_threshold}.{high_threshold}"
 
 
 edge_image = canny_edge_detection(original_image, low_threshold, high_threshold, gaussian_kernel_size, sobel_kernel_size)
-save_image(edge_image, f"EdgeDetected/{result}.jpg")
+save_image(edge_image, f"CompareCars/{carname}1.jpg")
