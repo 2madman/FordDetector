@@ -78,6 +78,7 @@ class ImageApp:
             if mse < lowest_mse:
                 lowest_mse = mse
                 car = image_path
+            print(f"{image_path}: MSE={mse}")
 
         car_name = compare.extract_until_number(car)
         print(car_name)
