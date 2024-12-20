@@ -3,7 +3,7 @@ import numpy as np
 import sys
 
 carname = "transitvan2"
-path_to_image = f"Cars/{carname}.png"
+path_to_image = f"Resized/{carname}.png"
 
 def save_image(image, file_path):
     # Convert numpy array to PIL Image and save it
