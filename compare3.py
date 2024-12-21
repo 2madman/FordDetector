@@ -5,6 +5,8 @@ import cv2
 import os
 from pathlib import Path
 
+np.random.seed(44)
+
 def get_points_from_edge(edge_img, n_points=100):
     y_coords, x_coords = np.where(edge_img > 0)
     
@@ -115,7 +117,7 @@ def compare_with_folder(target_image_path, folder_path="EdgeDetectedFolder"):
     return results
 
 def main():
-    target_image = "CompareCars/transitvan2.jpg"  # Replace with your target image path
+    target_image = "Cars/focus6.png"  # Replace with your target image path
     
     print("\nComparing images...")
     all_results = compare_with_folder(target_image)

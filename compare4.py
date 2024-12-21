@@ -6,6 +6,11 @@ import os
 from pathlib import Path
 from PIL import Image
 from canny import canny_edge_detection
+import compare
+
+np.random.seed(44)
+
+
 def get_points_from_edge(edge_img, n_points=100):
     y_coords, x_coords = np.where(edge_img > 0)
     
@@ -66,9 +71,21 @@ def is_edge_image(img):
     black_ratio = (img == 0).sum() / img.size
     return black_ratio > 0.8
 
-def compare_with_folder(target_image_path, folder_path="EdgeDetectedFolder"):
+def compare_with_folder(target_image_path, folder_path="Edge2nd"):
     # Read target image
     target_img = cv2.imread(target_image_path, cv2.IMREAD_GRAYSCALE)
+
+    '''
+    img = Image.open(target_image_path)
+    img_array = np.array(img)
+    resized_image_array = compare.resize_image(img_array, [376, 668])
+    resized_image = Image.fromarray(resized_image_array)
+    input_path = 'Temp/resized.png'
+    resized_image.save(input_path)
+
+    target_img = cv2.imread(input_path, cv2.IMREAD_GRAYSCALE)
+    '''
+
     target_img = canny_edge_detection(target_img,100,220,5,3)
     
     results = []
@@ -113,7 +130,7 @@ def compare_with_folder(target_image_path, folder_path="EdgeDetectedFolder"):
     return results
 
 def main():
-    target_image = "CompareCars/focus2.jpg"  # Replace with your target image path
+    target_image = "Cars/courier5.png"  # Replace with your target image path
     
     print("\nComparing images...")
     all_results = compare_with_folder(target_image)
@@ -124,8 +141,8 @@ def main():
     print("-" * 60)
     
     # Print all results sorted by similarity
-    for i, (filename, score) in enumerate(all_results, 1):
-        print(f"{i:<6} {filename:<40} {score:.2f}")
+    #for i, (filename, score) in enumerate(all_results, 1):
+        #print(f"{i:<6} {filename:<40} {score:.2f}")
     
 
 if __name__ == "__main__":

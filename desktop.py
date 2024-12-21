@@ -3,8 +3,21 @@ from tkinter import filedialog
 from tkinter import messagebox
 from PIL import Image, ImageTk
 import compare
+import compare4
 import numpy as np
 import threading
+import re
+
+def extract_name(text):
+    name = text.strip("'").split('6')[0]  # Gets 'courier'
+    return name
+
+def extract_name_regex(text):
+    pattern = r"'([a-zA-Z]+)\d"
+    match = re.search(pattern, text)
+    if match:
+        return match.group(1)
+    return None
 
 class ImageApp:
     def __init__(self, root):
@@ -48,21 +61,22 @@ class ImageApp:
 
         if file_path:
             try:
+                
                 # Process the image after loading
                 edge_detected_folder = "EdgeDetectedFolder"
-
+                '''
                 img = Image.open(file_path)
                 img_array = np.array(img)
                 resized_image_array = compare.resize_image(img_array, [376, 668])
                 resized_image = Image.fromarray(resized_image_array)
                 input_path = 'Temp/resized.png'
                 resized_image.save(input_path)
-
+                '''
                 # Show loading label
                 self.show_loading()
 
                 # Run the comparison in a separate thread
-                threading.Thread(target=self.process_image, args=(input_path, edge_detected_folder)).start()
+                threading.Thread(target=self.process_image, args=(file_path, edge_detected_folder)).start()
 
             except Exception as e:
                 messagebox.showerror("Error", f"Failed to load image:\n{e}")
@@ -70,6 +84,7 @@ class ImageApp:
             messagebox.showinfo("No Selection", "Select an image.")
 
     def process_image(self, input_path, edge_detected_folder):
+        '''
         edge_detected_results = compare.compare_with_edge_detected_folder(input_path, edge_detected_folder)
 
         lowest_mse = float('inf')
@@ -88,9 +103,27 @@ class ImageApp:
 
         # Hide loading label
         self.root.after(0, self.hide_loading)
+        '''
+        results = compare4.compare_with_folder(input_path)
+        car_name = results[0]
+        car_name = modify_string(car_name)
+        self.root.after(0, self.update_car_label, car_name)
+        self.root.after(0, self.hide_loading)
+
 
     def update_car_label(self, car_name):
-        self.car_label.config(text=f"Detected car: {car_name[19:].capitalize()}")
+        #self.car_label.config(text=f"Detected car: {car_name[19:].capitalize()}")
+        self.car_label.config(text=f"Detected car: {car_name}")
+
+    
+
+def modify_string(text):
+   text = str(text)
+   text = text[2:]
+   dot_index = text.find('.')
+   if dot_index != -1:
+       text = text[:dot_index-1]
+   return text.capitalize()
 
 if __name__ == "__main__":
     # Create the main application window
