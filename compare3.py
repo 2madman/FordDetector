@@ -115,7 +115,7 @@ def compare_with_folder(target_image_path, folder_path="EdgeDetectedFolder"):
     return results
 
 def main():
-    target_image = "CompareCars/focus2.jpg"  # Replace with your target image path
+    target_image = "CompareCars/transitvan2.jpg"  # Replace with your target image path
     
     print("\nComparing images...")
     all_results = compare_with_folder(target_image)
