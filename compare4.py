@@ -4,9 +4,7 @@ from scipy.optimize import linear_sum_assignment
 import cv2
 import os
 from pathlib import Path
-from PIL import Image
 from canny import canny_edge_detection
-import compare
 
 np.random.seed(44)
 
@@ -74,17 +72,6 @@ def is_edge_image(img):
 def compare_with_folder(target_image_path, folder_path="Edge2nd"):
     # Read target image
     target_img = cv2.imread(target_image_path, cv2.IMREAD_GRAYSCALE)
-
-    '''
-    img = Image.open(target_image_path)
-    img_array = np.array(img)
-    resized_image_array = compare.resize_image(img_array, [376, 668])
-    resized_image = Image.fromarray(resized_image_array)
-    input_path = 'Temp/resized.png'
-    resized_image.save(input_path)
-
-    target_img = cv2.imread(input_path, cv2.IMREAD_GRAYSCALE)
-    '''
 
     target_img = canny_edge_detection(target_img,100,220,5,3)
     

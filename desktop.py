@@ -1,8 +1,6 @@
 import tkinter as tk
 from tkinter import filedialog
 from tkinter import messagebox
-from PIL import Image, ImageTk
-import compare
 import compare4
 import numpy as np
 import threading
@@ -64,14 +62,6 @@ class ImageApp:
                 
                 # Process the image after loading
                 edge_detected_folder = "EdgeDetectedFolder"
-                '''
-                img = Image.open(file_path)
-                img_array = np.array(img)
-                resized_image_array = compare.resize_image(img_array, [376, 668])
-                resized_image = Image.fromarray(resized_image_array)
-                input_path = 'Temp/resized.png'
-                resized_image.save(input_path)
-                '''
                 # Show loading label
                 self.show_loading()
 
@@ -84,26 +74,6 @@ class ImageApp:
             messagebox.showinfo("No Selection", "Select an image.")
 
     def process_image(self, input_path, edge_detected_folder):
-        '''
-        edge_detected_results = compare.compare_with_edge_detected_folder(input_path, edge_detected_folder)
-
-        lowest_mse = float('inf')
-        car = ""
-        for image_path, mse in edge_detected_results.items():
-            if mse < lowest_mse:
-                lowest_mse = mse
-                car = image_path
-            print(f"{image_path}: MSE={mse}")
-
-        car_name = compare.extract_until_number(car)
-        print(car_name)
-
-        # Update the car label with the detected car name in the main thread
-        self.root.after(0, self.update_car_label, car_name)
-
-        # Hide loading label
-        self.root.after(0, self.hide_loading)
-        '''
         results = compare4.compare_with_folder(input_path)
         car_name = results[0]
         car_name = modify_string(car_name)
@@ -112,7 +82,6 @@ class ImageApp:
 
 
     def update_car_label(self, car_name):
-        #self.car_label.config(text=f"Detected car: {car_name[19:].capitalize()}")
         self.car_label.config(text=f"Detected car: {car_name}")
 
     
