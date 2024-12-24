@@ -6,8 +6,6 @@ import os
 from pathlib import Path
 from canny import canny_edge_detection
 
-np.random.seed(44)
-
 
 def get_points_from_edge(edge_img, n_points=100):
     y_coords, x_coords = np.where(edge_img > 0)
@@ -106,18 +104,19 @@ def compare_with_folder(target_image_path, folder_path="Edge2nd"):
                 progress = f"{processed_files}/{total_files}"
                 
                 # Print result for each image
-                print(f"{img_path.name:<40} {similarity_score:<15.2f} {progress}")
+                #print(f"{img_path.name:<40} {similarity_score:<15.2f} {progress}")
                 
             except Exception as e:
                 print(f"Error processing {img_path.name}: {str(e)}")
     
     # Sort results by similarity score (lower is more similar)
     results.sort(key=lambda x: x[1])
-    
+    for i, (filename, score) in enumerate(results, 1):
+        print(f"{i:<6} {filename:<40} {score:.2f}")
     return results
 
 def main():
-    target_image = "Cars/courier5.png"  # Replace with your target image path
+    target_image = "Cars/puma6.png"  # Replace with your target image path
     
     print("\nComparing images...")
     all_results = compare_with_folder(target_image)
@@ -128,8 +127,8 @@ def main():
     print("-" * 60)
     
     # Print all results sorted by similarity
-    #for i, (filename, score) in enumerate(all_results, 1):
-        #print(f"{i:<6} {filename:<40} {score:.2f}")
+    for i, (filename, score) in enumerate(all_results, 1):
+        print(f"{i:<6} {filename:<40} {score:.2f}")
     
 
 if __name__ == "__main__":

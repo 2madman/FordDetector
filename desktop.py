@@ -61,7 +61,7 @@ class ImageApp:
             try:
                 
                 # Process the image after loading
-                edge_detected_folder = "EdgeDetectedFolder"
+                edge_detected_folder = "Edge2nd"
                 # Show loading label
                 self.show_loading()
 

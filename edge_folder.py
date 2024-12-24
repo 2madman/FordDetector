@@ -133,8 +133,8 @@ def process_images_in_folder(input_folder, output_folder, low_threshold, high_th
         print(f"Saved edge-detected image: {output_path}")
 
 # Example usage
-input_folder = "Resized"
-output_folder = "EdgeDetectedFolder"
+input_folder = "Cars"
+output_folder = "Edge2nd"
 low_threshold = 100
 high_threshold = 220
 
